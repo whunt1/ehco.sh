@@ -17,7 +17,7 @@ export PATH
 
 [[ $EUID -ne 0 ]] && echo -e "[Error]请以root用户或者sudo提权运行本脚本！" && exit 1
 
-ehco_version="1.1.0"
+ehco_version="1.1.1"
 ehco_conf_dir="/usr/local/ehco/"
 CPUFrame=$(arch)
 SysID=$(cat /etc/os-release | grep ^ID=)
@@ -46,7 +46,7 @@ InitialEhco() {
 	    mkdir $ehco_conf_dir
     fi
     if [ ! -e "/usr/bin/ehco" ]; then
-    	url="https://leo.moe/ehco/ehco_${ehco_version}_linux_$1"
+    	url="https://cdn.jsdelivr.net/gh/whunt1/ehco.sh@main/ehco_${ehco_version}_linux_$1"
     	echo -e "${blue_prefix}[Info]${plain_prefix} 开始下载ehco文件..."
     	wget -O /usr/bin/ehco $url &> /dev/null
     	if [ $? -ne 0 ]; then
@@ -435,7 +435,7 @@ ConfPy() {
 	# 脚本文件
 	if [ ! -e "/usr/local/ehco/ehcoConfigure_beta01.py" ]; then
 		echo -e "${blue_prefix}[Info]${plain_prefix} 下载脚本文件中..."
-		wget -O /usr/local/ehco/ehcoConfigure_beta01.py "https://leo.moe/ehco/ehcoConfigure.py" &> null
+		wget -O /usr/local/ehco/ehcoConfigure_beta01.py "https://cdn.jsdelivr.net/gh/whunt1/ehco.sh@main/ehcoConfigure.py" &> null
 	fi
 	python3 /usr/local/ehco/ehcoConfigure_beta01.py
 }

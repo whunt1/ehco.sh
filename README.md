@@ -5,7 +5,7 @@ Ehco Tunnel Manage Script / Ehco 一键管理脚本 修复版
 > 
 > 原项目 https://github.com/sjlleo/ehco.sh
 
-[English Document](https://github.com/sjlleo/ehco.sh/blob/main/README.md) | [中文版说明文档](https://leo.moe/daily/ehco-Script.html)
+[English Document](https://github.com/whunt1/ehco.sh/blob/main/README.md) | [中文版说明文档（已失效）](https://leo.moe/daily/ehco-Script.html)
 
 **这是一个还在测试中的 Beta 脚本，没人保证它一定可用！**
 
@@ -44,11 +44,11 @@ The `ehco` is contributed by [Ehco1996](https://github.com/Ehco1996), see the pr
 ## Usage
 
 ```bash
-bash <(curl -fsSL https://git.io/ehco.sh)
+bash <(curl -fsSL https://git.io/JyrOJ)
 ```
 
 Or you can use this command for domestic server
 
 ```bash
-bash <(curl -fsSL https://leo.moe/ehco.sh)
+bash <(curl -fsSL https://moelink.org/ehco.sh)
 ```
