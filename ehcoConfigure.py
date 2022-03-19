@@ -213,8 +213,8 @@ class TerminalPanel():
             % (colorConst.blue_prefix,colorConst.plain_prefix,colorConst.yellow_prefix,colorConst.plain_prefix,colorConst.yellow_prefix,colorConst.plain_prefix,colorConst.yellow_prefix,colorConst.plain_prefix))
                 print("请选择传输协议（需与落地一致）")
             
-            print("%s1.%s mwss（稳定性极高且延时最低但传输速率最差）\n%s2.%s wss（较好的稳定性及较快的传输速率但延时较高）\n%s3.%s raw（无隧道直接转发、效率极高但无抗干扰能力）"
-                %(colorConst.green_prefix,colorConst.plain_prefix,colorConst.green_prefix,colorConst.plain_prefix,colorConst.green_prefix,colorConst.plain_prefix))
+            print("%s1.%s mwss（稳定性极高且延时最低但传输速率最差）\n%s2.%s wss（较好的稳定性及较快的传输速率但延时较高）\n%s3.%s raw（无隧道直接转发、效率极高但无抗干扰能力）\n%s4.%s ws（效率较高但不安全，有一定抗干扰能力）"
+                %(colorConst.green_prefix,colorConst.plain_prefix,colorConst.green_prefix,colorConst.plain_prefix,colorConst.green_prefix,colorConst.plain_prefix,colorConst.green_prefix,colorConst.plain_prefix))
 
             method = input("请输入序号或者协议名称：")
 
@@ -222,8 +222,10 @@ class TerminalPanel():
                 method = 'mwss'
             elif method == '2' or method == 'wss':
                 method = 'wss'
-            else:
+            elif method == '3' or method == 'raw':
                 method = 'raw'
+            else:
+                method = 'ws'
 
             if num == 1:
                 tempRemotesA = []
@@ -232,6 +234,8 @@ class TerminalPanel():
                 for i in IPList:
                     if method == 'raw':
                         tempRemotesA.append(i+':'+PortList[count])
+                    elif  method == 'ws':
+                        tempRemotesA.append("ws://"+i+':'+PortList[count])
                     else:
                         tempRemotesA.append("wss://"+i+':'+PortList[count])
                     tempRemotesB.append(i+':'+PortList[count])
@@ -415,7 +419,7 @@ class TerminalPanel():
             # 中转模式
             remoteIP = input("请输入远程IP地址：")
             remotePort = input("请输入远程远程主机端口：")
-            print("请选择传输协议（需与落地一致）：\n1.mwss（稳定性极高且延时最低但传输速率最差）\n2.wss（较好的稳定性及较快的传输速率但延时较高）\n3.raw（无隧道直接转发、效率极高但无抗干扰能力）")
+            print("请选择传输协议（需与落地一致）：\n1.mwss（稳定性极高且延时最低但传输速率最差）\n2.wss（较好的稳定性及较快的传输速率但延时较高）\n3.raw（无隧道直接转发、效率极高但无抗干扰能力）\n4.ws（效率较高但不安全，有一定抗干扰能力）")
             num = eval(input("输入序号："))
             if num == 1:
                 json_data['relay_configs'][count]['transport_type'] = 'mwss'
@@ -426,11 +430,14 @@ class TerminalPanel():
             elif num == 3:
                 json_data['relay_configs'][count]['transport_type'] = 'raw'
                 json_data['relay_configs'][count]['tcp_remotes'][0] = remoteIP + ":" + remotePort
+            elif num == 4:
+                json_data['relay_configs'][count]['transport_type'] = 'ws'
+                json_data['relay_configs'][count]['tcp_remotes'][0] = "ws://" + remoteIP + ":" + remotePort
             json_data['relay_configs'][count]['udp_remotes'][0] = remoteIP + ":" + remotePort
         elif k['transport_type'] == 'raw':
             # 落地模式
             remotePort = input("请输入流量目标端口：")
-            print("请选择传输协议：\n1.mwss（稳定性极高且延时最低但传输速率最差）\n2.wss（较好的稳定性及较快的传输速率但延时较高）\n3.raw（无隧道直接转发、效率极高但无抗干扰能力）")
+            print("请选择传输协议：\n1.mwss（稳定性极高且延时最低但传输速率最差）\n2.wss（较好的稳定性及较快的传输速率但延时较高）\n3.raw（无隧道直接转发、效率极高但无抗干扰能力）\n4.ws（效率较高但不安全，有一定抗干扰能力）")
             num = eval(input("输入序号（需与中转一致）："))
             if num == 1:
                 json_data['relay_configs'][count]['listen_type'] = 'mwss'
@@ -438,6 +445,8 @@ class TerminalPanel():
                 json_data['relay_configs'][count]['listen_type'] = 'wss'
             elif num == 3:
                 json_data['relay_configs'][count]['listen_type'] = 'raw'
+            elif num == 4:
+                json_data['relay_configs'][count]['listen_type'] = 'ws'
             json_data['relay_configs'][count]['tcp_remotes'][0] = "0.0.0.0:" + remotePort
             json_data['relay_configs'][count]['udp_remotes'][0] = "0.0.0.0:" + remotePort
         self.saveConf(json_data)

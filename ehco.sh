@@ -17,7 +17,7 @@ export PATH
 
 [[ $EUID -ne 0 ]] && echo -e "[Error]请以root用户或者sudo提权运行本脚本！" && exit 1
 
-ehco_version="1.1.1"
+ehco_version_default="1.1.1"
 ehco_conf_dir="/usr/local/ehco/"
 CPUFrame=$(arch)
 SysID=$(cat /etc/os-release | grep ^ID=)
@@ -46,6 +46,8 @@ InitialEhco() {
 	    mkdir $ehco_conf_dir
     fi
     if [ ! -e "/usr/bin/ehco" ]; then
+		read -p "请输入ehco 版本号（默认${ehco_version_default}）：" ehco_version
+		[ -z $ehco_version ] && ehco_version=ehco_version_default
     	url="https://cdn.jsdelivr.net/gh/whunt1/ehco.sh@main/ehco_${ehco_version}_linux_$1"
     	echo -e "${blue_prefix}[Info]${plain_prefix} 开始下载ehco文件..."
     	wget -O /usr/bin/ehco $url &> /dev/null
@@ -186,7 +188,7 @@ AddNewRelay() {
 		read -p "请输入远程IP或者域名：" remoteIP
 		read -p "请输入远程主机端口：" remotePort
 		echo -e "${blue_prefix}[Tips]${plain_prefix}  Ehco、Gost和其他隧道一样，都需要在中转和落地服务器两端分别部署发送端和接收端才可以连通\n\tEhco也提供单纯的流量转发，${yellow_prefix}raw${plain_prefix}模式就是一种单纯中转，它的作用和${yellow_prefix}iptables、brook${plain_prefix}中转无异"
-		echo -e "请选择传输协议（需与落地一致）：\n${green_prefix}1.${plain_prefix} mwss（稳定性极高且延时最低但传输速率最差）\n${green_prefix}2.${plain_prefix} wss（较好的稳定性及较快的传输速率但延时较高）\n${green_prefix}3.${plain_prefix} raw（无隧道直接转发、效率极高但无抗干扰能力）"
+		echo -e "请选择传输协议（需与落地一致）：\n${green_prefix}1.${plain_prefix} mwss（稳定性极高且延时最低但传输速率最差）\n${green_prefix}2.${plain_prefix} wss（较好的稳定性及较快的传输速率但延时较高）\n${green_prefix}3.${plain_prefix} raw（无隧道直接转发、效率极高但无抗干扰能力）\n${green_prefix}4.${plain_prefix} ws（效率较高但不安全，有一定抗干扰能力）"
 		read -p "输入序号：" num
 		case {$num} in
 			*1*)
@@ -199,6 +201,10 @@ AddNewRelay() {
 				;;
 			*3*)
 				transport_type=raw
+				conf="\n\t{\n\t\t\"listen\": \"0.0.0.0:$listenPort\",\n\t\t\"listen_type\": \"raw\",\n\t\t\"transport_type\": \"$transport_type\",\n\t\t\"tcp_remotes\": [\"$remoteIP:$remotePort\"],\n\t\t\"udp_remotes\": [\"$remoteIP:$remotePort\"]\n\t}$endl"
+				;;
+			*4*)
+				transport_type=ws
 				conf="\n\t{\n\t\t\"listen\": \"0.0.0.0:$listenPort\",\n\t\t\"listen_type\": \"raw\",\n\t\t\"transport_type\": \"$transport_type\",\n\t\t\"tcp_remotes\": [\"$remoteIP:$remotePort\"],\n\t\t\"udp_remotes\": [\"$remoteIP:$remotePort\"]\n\t}$endl"
 				;;
 		esac
@@ -231,7 +237,7 @@ AddNewRelay() {
 		done
 		echo -e "${blue_prefix}[Tips]${plain_prefix} 所谓的流量目标端口就是，流量最终将前往的地方，一般是部署在本机的代理的监听端口"
 		read -p "请输入流量目标端口：" remotePort
-		echo -e "请选择传输协议（需与中转一致）：\n${green_prefix}1.${plain_prefix} mwss（稳定性极高且延时最低但传输速率最差）\n${green_prefix}2.${plain_prefix} wss（较好的稳定性及较快的传输速率但延时较高）\n${green_prefix}3.${plain_prefix} raw（无隧道直接转发、效率极高但无抗干扰能力）"
+		echo -e "请选择传输协议（需与中转一致）：\n${green_prefix}1.${plain_prefix} mwss（稳定性极高且延时最低但传输速率最差）\n${green_prefix}2.${plain_prefix} wss（较好的稳定性及较快的传输速率但延时较高）\n${green_prefix}3.${plain_prefix} raw（无隧道直接转发、效率极高但无抗干扰能力）\n${green_prefix}4.${plain_prefix} ws（效率较高但不安全，有一定抗干扰能力）"
 		read -p "输入序号：" num
 		case {$num} in
 			*1*)
@@ -242,6 +248,9 @@ AddNewRelay() {
 				;;
 			*3*)
 				transport_type=raw
+				;;
+			*4*)
+				transport_type=ws
 				;;
 		esac
 		unset num
@@ -433,11 +442,11 @@ ConfPy() {
 		fi
 	fi
 	# 脚本文件
-	if [ ! -e "/usr/local/ehco/ehcoConfigure_beta01.py" ]; then
+	if [ ! -e "/usr/local/ehco/ehcoConfigure.py" ]; then
 		echo -e "${blue_prefix}[Info]${plain_prefix} 下载脚本文件中..."
-		wget -O /usr/local/ehco/ehcoConfigure_beta01.py "https://cdn.jsdelivr.net/gh/whunt1/ehco.sh@main/ehcoConfigure.py" &> null
+		wget -O /usr/local/ehco/ehcoConfigure.py "https://cdn.jsdelivr.net/gh/whunt1/ehco.sh@main/ehcoConfigure.py" &> null
 	fi
-	python3 /usr/local/ehco/ehcoConfigure_beta01.py
+	python3 /usr/local/ehco/ehcoConfigure.py
 }
 
 showMenu() {
